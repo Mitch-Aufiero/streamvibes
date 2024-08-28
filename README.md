@@ -1,1 +1,2 @@
 "# streamvibes" 
+![architecture](streamvibes.png)
