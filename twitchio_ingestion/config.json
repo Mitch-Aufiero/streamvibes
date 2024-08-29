@@ -1,6 +1,8 @@
 {
     "client_id": "",
     "client_secret": "",
+    "authorization_code": "",
+    "redirect_uri":"https://localhost",
     "channels": [
         ""
     ]

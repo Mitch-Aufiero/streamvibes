@@ -16,11 +16,16 @@ if __name__ == "__main__":
 
     client_id = config["client_id"]
     client_secret = config["client_secret"]
-    bot_name = "StreamVibesBot"
+    authorization_code = config["authorization_code"]
+    redirect_uri = config["redirect_uri"]
+    bot_name = "streamvibesbot"
     channels = config["channels"]
 
     # Instantiate the TokenManager
-    token_manager = TokenManager(client_id, client_secret)
+    token_manager = TokenManager(client_id, client_secret,authorization_code, redirect_uri)
+
+    print(f"OAuth Token: oauth:{token_manager.get_token()}")
+    print(f"Bot Name: {bot_name}")
 
     # Instantiate the TwitchChatClient with the TokenManager
     chat_client = TwitchChatClient(token_manager, bot_name, channels)
