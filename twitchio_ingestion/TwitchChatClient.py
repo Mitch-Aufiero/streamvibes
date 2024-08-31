@@ -1,6 +1,11 @@
 import twitchio
 from twitchio.ext import commands
+from kafka import KafkaProducer
 
+import json
+
+producer = KafkaProducer(bootstrap_servers='localhost:9092',
+                         value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
 class TwitchChatClient(commands.Bot):
     def __init__(self, token_manager, bot_name, channels, prefix="!"):
@@ -21,6 +26,5 @@ class TwitchChatClient(commands.Bot):
         print(f"Bot {self.nick} is ready to receive messages!")
 
     async def event_message(self, message):
-        print(message.content)
+        producer.send('twitch_chat', {'channel': message.channel.name, 'message': message.content})
 
-        # send message to kafka topic
