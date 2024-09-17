@@ -24,6 +24,7 @@ class SparkJob:
         """
         return SparkSession.builder \
             .appName(self.app_name) \
+            .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.2") \
             .getOrCreate()
 
     def load_s3_data(self, path:str) -> DataFrame:

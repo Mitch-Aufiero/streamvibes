@@ -4,7 +4,7 @@ services:
   spark-master:
     build: 
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./spark/Dockerfile
     container_name: spark_master
     ports:
       - "8080:8080" # gui - http//:localhost:8080
@@ -24,7 +24,7 @@ services:
   spark-worker-1:
     build: 
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./spark/Dockerfile
     container_name: spark_worker_1
     depends_on:
       - spark-master
@@ -45,7 +45,7 @@ services:
   spark-worker-2:
     build: 
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./spark/Dockerfile
     container_name: spark_worker_2
     depends_on:
       - spark-master
@@ -63,6 +63,55 @@ services:
     networks:
       - spark_network
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - spark_network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.2
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - spark_network
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    depends_on:
+      - kafka
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: kafka:9092
+    networks:
+      - spark_network
+
+  twitchio_ingestion:
+    build: 
+      context: .
+      dockerfile: ../twitchio_ingestion/Dockerfile
+    container_name: twitchio_ingestion
+    volumes:
+      - ../twitchio_ingestion:/app
+    networks: 
+      - spark_network
+
 networks:
   spark_network:
     driver: bridge
+
