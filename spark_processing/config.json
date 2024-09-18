@@ -1,0 +1,15 @@
+{
+    "kafka": {
+      "bootstrap_servers": "",
+      "topic": ""
+    },
+    "s3": {
+      "raw_bucket": "",
+      "processed_bucket":"",
+      "staging_bucket":"",
+      "endpoint_url": "",
+      "access_key": "",
+      "secret_key": ""
+    }
+}
+  
