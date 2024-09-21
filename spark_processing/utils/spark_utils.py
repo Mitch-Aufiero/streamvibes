@@ -14,18 +14,6 @@ class SparkJob:
         self.config = config
         self.spark = self.initialize_spark_session()
 
-    def load_config(self, config_file: str) -> dict:
-        """
-        Load configuration from a JSON file.
-
-        Parameters:
-        config_file (str): Path to the JSON configuration file.
-
-        Returns:
-        dict: Configuration data loaded from the file.
-        """
-        with open(config_file, 'r') as f:
-            return json.load(f)
 
     def initialize_spark_session(self) -> SparkSession:
         """
