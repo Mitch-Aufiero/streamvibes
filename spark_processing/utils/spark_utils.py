@@ -43,7 +43,7 @@ class SparkJob:
         Returns:
         DataFrame: A Spark DataFrame containing the data from the specified S3 file path.
         """
-        full_path = f"s3a://{self.config['s3']['bucket']}/{path}"
+        full_path = f"s3a://{path}"
         return self.spark.read.parquet(full_path)
 
     def write_s3_data(self, df: DataFrame, path: str):
@@ -57,7 +57,7 @@ class SparkJob:
         Returns:
         None
         """
-        full_path = f"s3a://{self.config['s3']['bucket']}/{path}"
+        full_path = f"s3a://{path}"
         df.write.parquet(full_path)
 
     def stop_spark(self) -> None:
