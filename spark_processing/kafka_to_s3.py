@@ -10,7 +10,9 @@ class KafkaToS3Job(SparkJob):
         super().__init__(app_name, config)
         self.kafka_bootstrap_servers = config["kafka"]["bootstrap_servers"]
         self.kafka_topic = config["kafka"]["topic"]
-        self.s3_output_path = config["s3"]["raw_bucket"]
+        
+        
+        self.s3_output_path = f"s3a://{config['s3']['raw_bucket']}"
         
         
         self.spark._jsc.hadoopConfiguration().set("fs.s3a.endpoint", config["s3"]["endpoint_url"])
@@ -26,6 +28,7 @@ class KafkaToS3Job(SparkJob):
             .option("kafka.bootstrap.servers", self.kafka_bootstrap_servers) \
             .option("subscribe", self.kafka_topic) \
             .option("startingOffsets", "earliest") \
+            .option("failOnDataLoss", "false") \
             .option("checkpointLocation", self.s3_output_path + "/kafka_checkpoints") \
             .load()
 
@@ -42,9 +45,9 @@ class KafkaToS3Job(SparkJob):
         query = df.withColumn("window", window(df["timestamp"], "1 hour")) \
             .writeStream \
             .format("parquet") \
-            .option("path", self.s3_output_path) \
+            .option("path", self.s3_output_path)  \
             .option("checkpointLocation", self.s3_output_path + "/_checkpoints") \
-            .trigger(processingTime='1 minute') \
+            .trigger(processingTime='10 seconds') \
             .partitionBy('window') \
             .start()
 
@@ -63,7 +66,6 @@ if __name__ == "__main__":
 
     print("Current working dir: ", os.getcwd())
 
-    
     job = KafkaToS3Job(
         app_name="KafkaToS3Job",
         config=config
